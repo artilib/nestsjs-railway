@@ -4,12 +4,15 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as process from 'node:process';
+import { ClientsModule } from './clients/clients.module';
+
+const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: `.env.${process.env.NODE_ENV} || 'development'}`,
       isGlobal: true,
+      envFilePath: !ENV ? `.env` : `.env.${ENV}`,
     }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
@@ -19,11 +22,12 @@ import * as process from 'node:process';
         username: configService.getOrThrow('DATABASE_USERNAME'),
         password: configService.getOrThrow('DATABASE_PASSWORD'),
         database: configService.getOrThrow('DATABASE_NAME'),
-        entities: [],
+        autoLoadEntities: true,
         synchronize: true,
       }),
       inject: [ConfigService],
     }),
+    ClientsModule,
   ],
 
   controllers: [AppController],

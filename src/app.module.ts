@@ -23,7 +23,7 @@ const ENV = process.env.NODE_ENV;
         password: configService.getOrThrow('DATABASE_PASSWORD'),
         database: configService.getOrThrow('DATABASE_NAME'),
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: configService.getOrThrow('DATABASE_SYNC'),
       }),
       inject: [ConfigService],
     }),
